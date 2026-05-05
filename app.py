@@ -6,6 +6,7 @@ from educational_content import educational_resources
 from community_forum import post_message, display_forum
 from wearable_integration import display_wearable_data
 from firebase_auth import login_signup
+from breathing_game import breathing_game
 
 # ✅ ADD THIS (VERY IMPORTANT)
 if 'mood_data' not in st.session_state:
@@ -20,7 +21,7 @@ if 'user' not in st.session_state:
 
 st.title("AI-Powered Mental Health App")
 
-menu = ["Mood Tracking", "Mindfulness Tools", "Educational Resources", "Community Forum", "Wearable Integration", "play game"]
+menu = ["Mood Tracking", "Mindfulness Tools", "Educational Resources", "Community Forum", "Wearable Integration", "Breathing Game"]
 choice = st.sidebar.selectbox("Select a feature", menu)
 
 if choice == "Mood Tracking":
@@ -36,3 +37,5 @@ elif choice == "Community Forum":
     display_forum()
 elif choice == "Wearable Integration":
     display_wearable_data()
+elif choice == "Breathing Game":
+    breathing_game()
