@@ -32,7 +32,11 @@ def login_signup():
                 auth.create_user_with_email_and_password(email, password)
                 st.success("Account created! Please login")
             except Exception as e:
-                st.error(f"Signup failed: {e}")
+                error_msg = str(e)
+                if "EMAIL_EXISTS" in error_msg:
+                    st.error("Email already in use. Please login.")
+                else:
+                    st.error(f"Signup failed: {e}")
 
     if choice == "Login":
         if st.button("Login"):
