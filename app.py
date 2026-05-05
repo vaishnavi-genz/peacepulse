@@ -10,6 +10,9 @@ from wearable_integration import display_wearable_data
 if 'mood_data' not in st.session_state:
     st.session_state.mood_data = []
 
+if 'forum_posts' not in st.session_state:
+    st.session_state.forum_posts = []
+
 st.title("AI-Powered Mental Health App")
 
 menu = ["Mood Tracking", "Mindfulness Tools", "Educational Resources", "Community Forum", "Wearable Integration", "play game"]
