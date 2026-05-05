@@ -2,7 +2,7 @@ import streamlit as st
 import pyrebase
 
 firebase_config = {
-    "apiKey": "AIzaSyBKfLSc3ZKsjA6OM7dHUafYxOvJmk6oZw8",
+    "apiKey": st.secrets["FIREBASE_API_KEY"],
     "authDomain": "abc12-d032b.firebaseapp.com",
     "projectId": "abc12-d032b",
     "storageBucket": "abc12-d032b.firebasestorage.app",
