@@ -6,6 +6,10 @@ from educational_content import educational_resources
 from community_forum import post_message, display_forum
 from wearable_integration import display_wearable_data
 
+# ✅ ADD THIS (VERY IMPORTANT)
+if 'mood_data' not in st.session_state:
+    st.session_state.mood_data = []
+
 st.title("AI-Powered Mental Health App")
 
 menu = ["Mood Tracking", "Mindfulness Tools", "Educational Resources", "Community Forum", "Wearable Integration", "play game"]
