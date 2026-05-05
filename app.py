@@ -5,6 +5,7 @@ from mindfulness_tools import guided_meditation, deep_breathing_exercise
 from educational_content import educational_resources
 from community_forum import post_message, display_forum
 from wearable_integration import display_wearable_data
+from firebase_auth import login_signup
 
 # ✅ ADD THIS (VERY IMPORTANT)
 if 'mood_data' not in st.session_state:
@@ -12,6 +13,10 @@ if 'mood_data' not in st.session_state:
 
 if 'forum_posts' not in st.session_state:
     st.session_state.forum_posts = []
+
+if 'user' not in st.session_state:
+    login_signup()
+    st.stop()
 
 st.title("AI-Powered Mental Health App")
 
