@@ -1,4 +1,4 @@
 streamlit
 matplotlib
 pandas
-pyrebase4
+pyrebase4google-generativeai
