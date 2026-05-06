@@ -107,20 +107,35 @@ AI: """
             try:
                 with st.spinner("Thinking gently..."):
                     response = model.generate_content(prompt_with_context)
-                if response and hasattr(response, "text") and response.text:
-                    full_response = response.text
-                else:
-                    full_response = "I'm here with you. Could you try sharing that again gently?"
-                message_placeholder.markdown(full_response)
-                # Add assistant response to chat history
-                st.session_state.chat_messages.append({
-                    "role": "assistant",
-                    "content": full_response
-                })
                 
+                # Check for safety blocks or empty text gracefully
+                try:
+                    full_response = response.text
+                except Exception as text_e:
+                    print(f"Response parsing blocked/empty: {text_e}")
+                    # Usually means the prompt was flagged by Gemini Safety Settings
+                    full_response = "I hear you. That sounds really heavy, and while I want to be here for you, I'm an AI and have some limits on what I can discuss safely. If you're in distress, please reach out to a trusted professional."
+                
+                message_placeholder.markdown(full_response)
+                
+                # Add assistant response to chat history
+                st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
                 insert_chat_log(user_email, "assistant", full_response)
+                
                 # Enforce session state limit
                 if len(st.session_state.chat_messages) > 20:
                     st.session_state.chat_messages = st.session_state.chat_messages[-20:]
-
-            except Exception as e:st.error(f"Gemini Error: {e}")
+                
+            except Exception as e:
+                err_str = str(e)
+                if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
+                    error_msg = "It seems my API key isn't configured correctly. Please check the Streamlit secrets."
+                elif "Quota exceeded" in err_str or "429" in err_str or "Resource has been exhausted" in err_str:
+                    error_msg = "I'm receiving a lot of thoughts right now and need a short break. Please take a slow, deep breath and try again in a minute."
+                elif "DeadlineExceeded" in err_str or "503" in err_str or "Timeout" in err_str:
+                    error_msg = "The connection is a bit slow right now. Let's take a deep breath and try again in a moment."
+                else:
+                    error_msg = "I couldn't quite process that. Could we try again gently?"
+                    
+                message_placeholder.error(error_msg)
+                print(f"Gemini API Error: {err_str}")
