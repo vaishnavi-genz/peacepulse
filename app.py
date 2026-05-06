@@ -9,10 +9,12 @@ from mood_tracking import log_mood, display_mood_trends
 from educational_content import educational_resources
 from community_forum import post_message, display_forum
 from firebase_auth import login_signup
-from games import breathing_game, positive_affirmations, emoji_memory_game
+from games import breathing_game, positive_affirmations, emoji_memory_game, grounding_exercise
 from database import init_db
 from analytics import display_analytics
 from chatbot import display_chatbot
+from music_recommender import display_music_therapy
+from wellness_recommendations import display_wellness_suggestions
 
 # Initialize SQLite database
 init_db()
@@ -40,7 +42,9 @@ menu = [
     "📊 Analytics Dashboard",
     "🤖 AI Wellness Chat",
     "💬 Community Forum", 
-    "🎮 Therapeutic Games",
+    "🎵 Music Therapy",
+    "🎮 Wellness Games",
+    "🌿 Wellness Suggestions",
     "📚 Educational Resources"
 ]
 choice = st.sidebar.radio("Navigate", menu)
@@ -98,16 +102,29 @@ elif choice == "💬 Community Forum":
     post_message()
     display_forum()
 
-elif choice == "🎮 Therapeutic Games":
-    st.title("🎮 Therapeutic Games")
-    game_choice = st.selectbox("Choose an activity", ["Breathing Exercise", "Positive Affirmations", "Emoji Memory Game"])
+elif choice == "🎵 Music Therapy":
+    display_music_therapy()
+
+elif choice == "🎮 Wellness Games":
+    st.title("🎮 Wellness Games")
+    game_choice = st.selectbox("Choose a gentle activity", [
+        "Breathing Exercise", 
+        "Positive Affirmations", 
+        "Calm Matching Game",
+        "5-4-3-2-1 Grounding"
+    ])
     
     if game_choice == "Breathing Exercise":
         breathing_game()
     elif game_choice == "Positive Affirmations":
         positive_affirmations()
-    elif game_choice == "Emoji Memory Game":
+    elif game_choice == "Calm Matching Game":
         emoji_memory_game()
+    elif game_choice == "5-4-3-2-1 Grounding":
+        grounding_exercise()
+
+elif choice == "🌿 Wellness Suggestions":
+    display_wellness_suggestions()
 
 elif choice == "📚 Educational Resources":
     st.title("📚 Educational Resources")
