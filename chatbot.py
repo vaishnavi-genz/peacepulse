@@ -107,19 +107,20 @@ AI: """
             try:
                 with st.spinner("Thinking gently..."):
                     response = model.generate_content(prompt_with_context)
-                    
-                full_response = response.text
+                if response and hasattr(response, "text") and response.text:
+                    full_response = response.text
+                else:
+                    full_response = "I'm here with you. Could you try sharing that again gently?"
                 message_placeholder.markdown(full_response)
-                
                 # Add assistant response to chat history
-                st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
-                insert_chat_log(user_email, "assistant", full_response)
+                st.session_state.chat_messages.append({
+                    "role": "assistant",
+                    "content": full_response
+                })
                 
+                insert_chat_log(user_email, "assistant", full_response)
                 # Enforce session state limit
                 if len(st.session_state.chat_messages) > 20:
                     st.session_state.chat_messages = st.session_state.chat_messages[-20:]
-                
-            except Exception as e:
-                error_msg = "I'm having a little trouble connecting right now. Let's take a deep breath and try again in a moment."
-                message_placeholder.error(error_msg)
-                print(f"Gemini API Error: {e}")
+
+            except Exception as e:st.error(f"Gemini Error: {e}")
