@@ -15,7 +15,8 @@ def initialize_chatbot():
     
     try:
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Using 'gemini-pro' as it is globally available and robust for text tasks
+        model = genai.GenerativeModel('gemini-pro')
         return model
     except Exception as e:
         print(f"Error configuring Gemini: {e}")
@@ -108,26 +109,6 @@ AI: """
                 with st.spinner("Thinking gently..."):
                     response = model.generate_content(prompt_with_context)
                 
-                # --- TEMPORARY DEBUG OUTPUT ---
-                with st.expander("🚨 DEBUG: Raw Gemini Response Structure", expanded=True):
-                    st.write("**Response Type:**", str(type(response)))
-                    try:
-                        st.write("**Response Text:**", response.text)
-                    except Exception as e:
-                        st.write("**Response Text Error:**", str(e))
-                    try:
-                        st.write("**Candidates:**", response.candidates)
-                        if len(response.candidates) > 0:
-                            st.write("**Finish Reason:**", response.candidates[0].finish_reason)
-                            st.write("**Safety Ratings:**", response.candidates[0].safety_ratings)
-                    except Exception as e:
-                        st.write("**Candidates Access Error:**", str(e))
-                    try:
-                        st.write("**Parts:**", response.parts)
-                    except Exception as e:
-                        st.write("**Parts Access Error:**", str(e))
-                # ------------------------------
-
                 # Robust response extraction
                 full_response = None
                 
@@ -141,7 +122,7 @@ AI: """
                     elif hasattr(response, 'parts') and len(response.parts) > 0:
                         full_response = response.parts[0].text
                 except Exception as parse_err:
-                    st.error(f"🚨 DEBUG PARSE EXCEPTION: {str(parse_err)}")
+                    pass
                 
                 # Handle safety blocks or empty content
                 if not full_response:
@@ -172,17 +153,8 @@ AI: """
                     st.session_state.chat_messages = st.session_state.chat_messages[-20:]
                 
             except Exception as e:
-                import traceback
                 err_str = str(e)
-                tb_str = traceback.format_exc()
                 
-                # --- TEMPORARY DEBUG OUTPUT ---
-                with st.expander("🚨 DEBUG: API Exception Details", expanded=True):
-                    st.write(f"**Error Type:** {type(e).__name__}")
-                    st.write(f"**Error Message:** {err_str}")
-                    st.code(tb_str, language='python')
-                # ------------------------------
-
                 if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
                     error_msg = "It seems my API key isn't configured correctly. Please check the Streamlit secrets."
                 elif "Quota exceeded" in err_str or "429" in err_str or "Resource has been exhausted" in err_str:
