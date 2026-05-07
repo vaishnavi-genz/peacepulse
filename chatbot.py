@@ -15,8 +15,8 @@ def initialize_chatbot():
     
     try:
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        # Using 'gemini-pro' as it is globally available and robust for text tasks
-        model = genai.GenerativeModel('gemini-pro')
+        # Use gemini-flash-latest as per available models
+        model = genai.GenerativeModel('gemini-flash-latest')
         return model
     except Exception as e:
         print(f"Error configuring Gemini: {e}")
