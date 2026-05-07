@@ -119,3 +119,15 @@ def grounding_exercise():
     if st.button("I feel more grounded"):
         st.success("Wonderful. Carry this presence with you into your day. 🌿")
     st.markdown('</div>', unsafe_allow_html=True)
+
+def display_contextual_activity(mood):
+    if mood in ["Anxious"]:
+        breathing_game()
+    elif mood in ["Sad"]:
+        positive_affirmations()
+    elif mood in ["Angry"]:
+        grounding_exercise()
+    elif mood in ["Happy"]:
+        positive_affirmations()
+    else:
+        emoji_memory_game()

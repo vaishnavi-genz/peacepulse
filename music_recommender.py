@@ -22,26 +22,15 @@ def get_music_recommendations(mood):
     
     return music_map.get(mood, music_map["Neutral"])
 
-def display_music_therapy():
-    st.title("🎵 Music Therapy")
-    st.markdown("Immerse yourself in sounds carefully selected for your emotional state.")
+def display_compact_music_section(mood):
+    recs = get_music_recommendations(mood)
     
-    current_mood = st.session_state.get("current_mood", "Neutral")
-    
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown(f"### Curated for your mood: **{current_mood}**")
-    
-    recs = get_music_recommendations(current_mood)
+    st.markdown(f"#### 🎵 Curated for your mood: **{mood}**")
     
     for rec in recs:
-        st.markdown(f"#### {rec['title']}")
-        st.write(rec['desc'])
-        # Streamlit st.video automatically prevents autoplay and is mobile responsive
+        st.markdown(f"**{rec['title']}**")
+        st.markdown(f"<span style='font-size: 0.9rem; color: #64748b;'>{rec['desc']}</span>", unsafe_allow_html=True)
         st.video(rec['url'])
         st.markdown("<br>", unsafe_allow_html=True)
         
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.info("💡 **Tip:** Listen with headphones and take a few slow, deep breaths while the music plays.")
-    st.markdown('</div>', unsafe_allow_html=True)
