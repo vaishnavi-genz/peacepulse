@@ -108,14 +108,59 @@ AI: """
                 with st.spinner("Thinking gently..."):
                     response = model.generate_content(prompt_with_context)
                 
-                # Check for safety blocks or empty text gracefully
-                try:
-                    full_response = response.text
-                except Exception as text_e:
-                    print(f"Response parsing blocked/empty: {text_e}")
-                    # Usually means the prompt was flagged by Gemini Safety Settings
-                    full_response = "I hear you. That sounds really heavy, and while I want to be here for you, I'm an AI and have some limits on what I can discuss safely. If you're in distress, please reach out to a trusted professional."
+                # --- TEMPORARY DEBUG OUTPUT ---
+                with st.expander("🚨 DEBUG: Raw Gemini Response Structure", expanded=True):
+                    st.write("**Response Type:**", str(type(response)))
+                    try:
+                        st.write("**Response Text:**", response.text)
+                    except Exception as e:
+                        st.write("**Response Text Error:**", str(e))
+                    try:
+                        st.write("**Candidates:**", response.candidates)
+                        if len(response.candidates) > 0:
+                            st.write("**Finish Reason:**", response.candidates[0].finish_reason)
+                            st.write("**Safety Ratings:**", response.candidates[0].safety_ratings)
+                    except Exception as e:
+                        st.write("**Candidates Access Error:**", str(e))
+                    try:
+                        st.write("**Parts:**", response.parts)
+                    except Exception as e:
+                        st.write("**Parts Access Error:**", str(e))
+                # ------------------------------
+
+                # Robust response extraction
+                full_response = None
                 
+                try:
+                    if hasattr(response, 'text') and response.text:
+                        full_response = response.text
+                    elif hasattr(response, 'candidates') and len(response.candidates) > 0:
+                        candidate = response.candidates[0]
+                        if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts') and len(candidate.content.parts) > 0:
+                            full_response = candidate.content.parts[0].text
+                    elif hasattr(response, 'parts') and len(response.parts) > 0:
+                        full_response = response.parts[0].text
+                except Exception as parse_err:
+                    st.error(f"🚨 DEBUG PARSE EXCEPTION: {str(parse_err)}")
+                
+                # Handle safety blocks or empty content
+                if not full_response:
+                    is_blocked = False
+                    try:
+                        if hasattr(response, 'candidates') and len(response.candidates) > 0:
+                            finish_reason = getattr(response.candidates[0], 'finish_reason', None)
+                            if finish_reason and getattr(finish_reason, 'name', str(finish_reason)) == 'SAFETY':
+                                is_blocked = True
+                            elif str(finish_reason) == '3': # Safety code
+                                is_blocked = True
+                    except:
+                        pass
+                        
+                    if is_blocked:
+                        full_response = "I hear you. That sounds really heavy, and while I want to be here for you, I'm an AI and have some limits on what I can discuss safely. If you're in distress, please reach out to a trusted professional."
+                    else:
+                        full_response = "I felt your message, but my response didn't come through clearly. Could we try again gently?"
+
                 message_placeholder.markdown(full_response)
                 
                 # Add assistant response to chat history
@@ -127,7 +172,17 @@ AI: """
                     st.session_state.chat_messages = st.session_state.chat_messages[-20:]
                 
             except Exception as e:
+                import traceback
                 err_str = str(e)
+                tb_str = traceback.format_exc()
+                
+                # --- TEMPORARY DEBUG OUTPUT ---
+                with st.expander("🚨 DEBUG: API Exception Details", expanded=True):
+                    st.write(f"**Error Type:** {type(e).__name__}")
+                    st.write(f"**Error Message:** {err_str}")
+                    st.code(tb_str, language='python')
+                # ------------------------------
+
                 if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
                     error_msg = "It seems my API key isn't configured correctly. Please check the Streamlit secrets."
                 elif "Quota exceeded" in err_str or "429" in err_str or "Resource has been exhausted" in err_str:
@@ -138,4 +193,3 @@ AI: """
                     error_msg = "I couldn't quite process that. Could we try again gently?"
                     
                 message_placeholder.error(error_msg)
-                print(f"Gemini API Error: {err_str}")
